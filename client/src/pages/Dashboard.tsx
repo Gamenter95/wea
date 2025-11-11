@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, Plus, Send, ArrowDownToLine, Home, Wallet, CreditCard, Globe, User, LogOut, Bell, Phone, MessageCircle, Key } from "lucide-react";
+import { Menu, Plus, Send, ArrowDownToLine, Home, Wallet, CreditCard, Globe, User, LogOut, Bell, Phone, MessageCircle } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -70,7 +70,6 @@ export default function Dashboard() {
     { icon: ArrowDownToLine, label: "Withdraw", onClick: () => { setIsMenuOpen(false); setLocation("/withdraw"); } },
     { icon: Globe, label: "API Gateway", onClick: () => { setIsMenuOpen(false); toast({ title: "Coming Soon", description: "API Gateway feature coming soon!" }); } },
     { icon: User, label: "Profile", onClick: () => { setIsMenuOpen(false); setLocation("/profile"); } },
-    { icon: Key, label: "API Settings", onClick: () => { setIsMenuOpen(false); setLocation("/api"); } },
     { icon: MessageCircle, label: "Contact Us", onClick: () => { setIsMenuOpen(false); window.open("https://t.me/WeooWallet", "_blank"); } },
   ];
 

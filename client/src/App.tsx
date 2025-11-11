@@ -18,8 +18,7 @@ import Secret from "@/pages/Secret";
 import Admin from "@/pages/Admin";
 import Notifications from "@/pages/Notifications";
 import Profile from "@/pages/Profile";
-import APIPage from "@/pages/API";
-import NotFound from "./pages/not-found";
+import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
@@ -40,7 +39,6 @@ function Router() {
       <Route path="/admin" component={Admin} />
       <Route path="/notifications" component={Notifications} />
       <Route path="/profile" component={Profile} />
-      <Route path="/api" component={APIPage} />
       <Route component={NotFound} />
     </Switch>
   );
