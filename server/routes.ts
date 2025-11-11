@@ -567,6 +567,143 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // API Settings - Get
+  app.get("/api/settings/api", async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const settings = await storage.getApiSettings(req.session.userId);
+      res.json(settings);
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to get API settings" });
+    }
+  });
+
+  // API Settings - Toggle
+  app.post("/api/settings/toggle-api", async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { enabled } = req.body;
+      const settings = await storage.updateApiSettings(req.session.userId, enabled);
+      
+      res.json({ success: true, settings });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Failed to update settings" });
+    }
+  });
+
+  // API Settings - Generate Token
+  app.post("/api/settings/generate-token", async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const token = Math.random().toString(36).substring(2, 7).toUpperCase();
+      const settings = await storage.updateApiSettings(req.session.userId, true, token);
+      
+      res.json({ success: true, settings });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Failed to generate token" });
+    }
+  });
+
+  // API Settings - Revoke Token
+  app.post("/api/settings/revoke-token", async (req, res) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const settings = await storage.updateApiSettings(req.session.userId, false, null);
+      
+      res.json({ success: true, settings });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Failed to revoke token" });
+    }
+  });
+
+  // API Payment Endpoint
+  app.post("/api/payment", async (req, res) => {
+    try {
+      const { type, token, wwid, amount } = req.query;
+
+      if (type !== "wallet") {
+        return res.status(400).json({ error: "Invalid payment type" });
+      }
+
+      if (!token || !wwid || !amount) {
+        return res.status(400).json({ error: "Missing required parameters" });
+      }
+
+      const amountNum = parseFloat(amount as string);
+      if (isNaN(amountNum) || amountNum <= 0) {
+        return res.status(400).json({ error: "Invalid amount" });
+      }
+
+      const allUsers = await storage.getAllUsers();
+      const sender = allUsers.find((u: any) => u.apiToken === token && u.apiEnabled);
+
+      if (!sender) {
+        return res.status(401).json({ error: "Invalid or revoked token" });
+      }
+
+      const recipient = await storage.getUserByWWID(wwid as string);
+      if (!recipient) {
+        return res.status(404).json({ error: "Recipient not found" });
+      }
+
+      if (sender.id === recipient.id) {
+        return res.status(400).json({ error: "Cannot pay to yourself" });
+      }
+
+      const senderBalance = parseFloat(sender.balance);
+      if (senderBalance < amountNum) {
+        return res.status(400).json({ error: "Insufficient balance" });
+      }
+
+      const newSenderBalance = (senderBalance - amountNum).toFixed(2);
+      const newRecipientBalance = (parseFloat(recipient.balance) + amountNum).toFixed(2);
+
+      await storage.updateUserBalance(sender.id, newSenderBalance);
+      await storage.updateUserBalance(recipient.id, newRecipientBalance);
+
+      const transaction = await storage.createTransaction({
+        senderId: sender.id,
+        recipientId: recipient.id,
+        amount: amountNum.toFixed(2),
+      });
+
+      await storage.createNotification({
+        userId: sender.id,
+        type: "payment_sent",
+        title: "API Payment Sent",
+        message: `₹${amountNum.toFixed(2)} sent to ${recipient.wwid} via API`,
+      });
+
+      await storage.createNotification({
+        userId: recipient.id,
+        type: "payment_received",
+        title: "Payment Received",
+        message: `₹${amountNum.toFixed(2)} received from ${sender.wwid} via API`,
+      });
+
+      res.json({
+        success: true,
+        message: "Payment successful",
+        transaction,
+        newBalance: newSenderBalance,
+      });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Payment failed" });
+    }
+  });
+
   // Profile Update
   app.post("/api/profile/update", async (req, res) => {
     if (!req.session?.userId) {

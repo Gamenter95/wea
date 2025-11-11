@@ -26,6 +26,8 @@ export interface IStorage {
   createNotification(data: any): Promise<any>;
   getUserNotifications(userId: string): Promise<any[]>;
   updateUserField(userId: string, field: string, value: string): Promise<void>;
+  getApiSettings(userId: string): Promise<any>;
+  updateApiSettings(userId: string, enabled: boolean, token?: string): Promise<any>;
 }
 
 export class DbStorage implements IStorage {
@@ -168,7 +170,34 @@ export class DbStorage implements IStorage {
   }
 
   async updateUserField(userId: string, field: string, value: string): Promise<void> {
-    await db.update(users).set({ [field]: value }).where(eq(users.id, userId));
+    await db
+      .update(users)
+      .set({ [field]: value })
+      .where(eq(users.id, userId));
+  }
+
+  async getApiSettings(userId: string): Promise<any> {
+    const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    if (!user[0]) return null;
+
+    return {
+      enabled: user[0].apiEnabled || false,
+      token: user[0].apiToken || null,
+    };
+  }
+
+  async updateApiSettings(userId: string, enabled: boolean, token?: string): Promise<any> {
+    const updateData: any = { apiEnabled: enabled };
+    if (token !== undefined) {
+      updateData.apiToken = token;
+    }
+
+    await db
+      .update(users)
+      .set(updateData)
+      .where(eq(users.id, userId));
+
+    return this.getApiSettings(userId);
   }
 }
 
