@@ -814,22 +814,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/api-settings/update-domain", async (req, res) => {
-    try {
-      if (!req.session?.userId) {
-        return res.status(401).json({ error: "Not authenticated" });
-      }
-
-      const validatedData = req.body as { domain: string };
-      const { domain } = validatedData;
-      
-      const settings = await storage.updateApiSettings(req.session.userId, { domain });
-
-      res.json(settings);
-    } catch (error: any) {
-      res.status(400).json({ error: "Failed to update domain" });
-    }
-  });
 
   // Public API Wallet Endpoint
   app.get("/api/wallet", async (req, res) => {
