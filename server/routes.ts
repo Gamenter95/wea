@@ -5,12 +5,10 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import {
   registerSchema,
-  wwidSchema,
   spinSchema,
   loginSchema,
   verifyPinSchema,
   type RegisterInput,
-  type WWIDInput,
   type SPINInput,
   type LoginInput,
   type VerifyPinInput,
@@ -57,44 +55,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Registration - Step 2: WWID setup
-  app.post("/api/auth/setup-wwid", async (req, res) => {
-    try {
-      if (!req.session.registrationData) {
-        return res.status(400).json({ 
-          error: "Registration session expired. Please start registration again.",
-          sessionExpired: true 
-        });
-      }
-
-      const validatedData = wwidSchema.parse(req.body) as WWIDInput;
-      const fullWWID = `${validatedData.wwid}@ww`;
-
-      // Check if WWID already exists
-      const existingWWID = await storage.getUserByWWID(fullWWID);
-      if (existingWWID) {
-        return res.status(400).json({ error: "WWID already taken" });
-      }
-
-      // Store WWID in session and save
-      req.session.wwid = fullWWID;
-      await new Promise<void>((resolve, reject) => {
-        req.session.save((err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
-
-      res.json({ success: true, wwid: fullWWID });
-    } catch (error: any) {
-      res.status(400).json({ error: error.message || "Invalid WWID" });
-    }
-  });
-
-  // Registration - Step 3: S-PIN setup and complete registration
+  // Registration - Step 2: S-PIN setup and complete registration
   app.post("/api/auth/setup-spin", async (req, res) => {
     try {
-      if (!req.session.registrationData || !req.session.wwid) {
+      if (!req.session.registrationData) {
         return res.status(400).json({ 
           error: "Registration session expired. Please start registration again.",
           sessionExpired: true 
@@ -106,18 +70,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Hash S-PIN
       const hashedSPIN = await bcrypt.hash(validatedData.spin, 10);
 
+      // Create user with phone as WWID (format: +1234567890@ww)
+      const phoneWWID = `${req.session.registrationData.phone}@ww`;
+
       // Create user with all data
       const user = await storage.createUser({
         username: req.session.registrationData.username,
         phone: req.session.registrationData.phone,
         password: req.session.registrationData.password,
-        wwid: req.session.wwid,
+        wwid: phoneWWID,
         spin: hashedSPIN,
       });
 
       // Clear registration data from session
       delete req.session.registrationData;
-      delete req.session.wwid;
 
       await new Promise<void>((resolve, reject) => {
         req.session.save((err) => {
@@ -132,6 +98,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user: {
           id: user.id,
           username: user.username,
+          phone: user.phone,
           wwid: user.wwid,
         },
       });
