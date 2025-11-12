@@ -82,7 +82,7 @@ export async function initializeDatabase() {
     // Create gift_codes table
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS gift_codes (
-        id TEXT PRIMARY KEY,
+        id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
         creator_id TEXT NOT NULL REFERENCES users(id),
         code TEXT NOT NULL UNIQUE,
         total_users INTEGER NOT NULL,
@@ -98,7 +98,7 @@ export async function initializeDatabase() {
     // Create gift_code_claims table
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS gift_code_claims (
-        id TEXT PRIMARY KEY,
+        id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
         gift_code_id TEXT NOT NULL REFERENCES gift_codes(id),
         user_id TEXT NOT NULL REFERENCES users(id),
         amount NUMERIC(10, 2) NOT NULL,

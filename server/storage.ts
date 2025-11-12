@@ -229,6 +229,7 @@ export class DbStorage implements IStorage {
 
   async createGiftCode(data: { creatorId: string; code: string; totalUsers: number; amountPerUser: string; totalAmount: string; comment?: string }) {
     const [giftCode] = await db.insert(giftCodes).values({
+      id: generateId(),
       ...data,
       remainingUsers: data.totalUsers,
     }).returning();
@@ -261,6 +262,7 @@ export class DbStorage implements IStorage {
 
   async claimGiftCode(giftCodeId: string, userId: string, amount: string) {
     const [claim] = await db.insert(giftCodeClaims).values({
+      id: generateId(),
       giftCodeId,
       userId,
       amount,
