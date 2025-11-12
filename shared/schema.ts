@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, numeric, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, numeric, timestamp, boolean, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -57,7 +57,21 @@ export const addFundSchema = z.object({
 });
 
 export const payToUserSchema = z.object({
+  recipientWWID: z.string().min(5),
+  amount: z.number().min(1, "Amount must be at least ₹1"),
+  spin: z.string().regex(/^\d{4}$/, "S-PIN must be exactly 4 digits"),
+});
 
+export const createGiftCodeSchema = z.object({
+  totalUsers: z.number().min(1, "Must allow at least 1 user"),
+  amountPerUser: z.number().min(1, "Amount per user must be at least ₹1"),
+  comment: z.string().optional(),
+  code: z.string().optional(),
+});
+
+export const claimGiftCodeSchema = z.object({
+  code: z.string().min(1, "Code is required"),
+});
 
 export const giftCodes = pgTable("gift_codes", {
   id: text("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -165,3 +179,7 @@ export type PayToUserInput = z.infer<typeof payToUserSchema>;
 export type WithdrawInput = z.infer<typeof withdrawSchema>;
 export type ApiSettings = typeof apiSettings.$inferSelect;
 export type InsertApiSettings = z.infer<typeof insertApiSettingsSchema>;
+export type CreateGiftCodeInput = z.infer<typeof createGiftCodeSchema>;
+export type ClaimGiftCodeInput = z.infer<typeof claimGiftCodeSchema>;
+export type GiftCode = typeof giftCodes.$inferSelect;
+export type GiftCodeClaim = typeof giftCodeClaims.$inferSelect;
