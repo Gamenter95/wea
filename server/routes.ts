@@ -905,6 +905,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { totalUsers, amountPerUser, comment, code } = req.body;
 
+      if (!totalUsers || totalUsers <= 0) {
+        return res.status(400).json({ error: "Number of users must be at least 1" });
+      }
+
+      if (!amountPerUser || amountPerUser <= 0) {
+        return res.status(400).json({ error: "Amount per user must be at least ₹1" });
+      }
+
       const user = await storage.getUser(req.session.userId);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
@@ -914,7 +922,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userBalance = parseFloat(user.balance);
 
       if (userBalance < totalAmount) {
-        return res.status(400).json({ error: "Insufficient balance" });
+        return res.status(400).json({ error: `Insufficient balance. You need ₹${totalAmount.toFixed(2)} but have ₹${userBalance.toFixed(2)}` });
       }
 
       // Generate code if not provided
@@ -931,7 +939,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         giftCode = giftCode.toUpperCase();
         const existing = await storage.getGiftCodeByCode(giftCode);
         if (existing) {
-          return res.status(400).json({ error: "Code already exists" });
+          return res.status(400).json({ error: "This custom code is already taken. Please choose a different one." });
         }
       }
 
@@ -949,7 +957,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ success: true, giftCode: created });
     } catch (error: any) {
-      res.status(400).json({ error: error.message || "Failed to create gift code" });
+      console.error("Gift code creation error:", error);
+      res.status(500).json({ error: error.message || "Failed to create gift code. Please try again." });
     }
   });
 
@@ -961,23 +970,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { code } = req.body;
 
+      if (!code || !code.trim()) {
+        return res.status(400).json({ error: "Please enter a gift code" });
+      }
+
       const giftCode = await storage.getGiftCodeByCode(code.toUpperCase());
       if (!giftCode) {
-        return res.status(404).json({ error: "Invalid code" });
+        return res.status(404).json({ error: "This gift code doesn't exist. Please check and try again." });
       }
 
       if (!giftCode.isActive) {
-        return res.status(400).json({ error: "This code is no longer active" });
+        return res.status(400).json({ error: "This gift code has been stopped by the creator and is no longer active" });
       }
 
       if (giftCode.remainingUsers <= 0) {
-        return res.status(400).json({ error: "This code has been fully claimed" });
+        return res.status(400).json({ error: "This gift code has been fully claimed by other users" });
       }
 
       const claims = await storage.getGiftCodeClaims(giftCode.id);
       const alreadyClaimed = claims.some(claim => claim.userId === req.session.userId);
       if (alreadyClaimed) {
-        return res.status(400).json({ error: "You have already claimed this code" });
+        return res.status(400).json({ error: "You have already claimed this gift code" });
       }
 
       const user = await storage.getUser(req.session.userId);
@@ -1001,7 +1014,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ success: true, amount: amount.toFixed(2), newBalance });
     } catch (error: any) {
-      res.status(400).json({ error: error.message || "Failed to claim gift code" });
+      console.error("Gift code claim error:", error);
+      res.status(500).json({ error: error.message || "Failed to claim gift code. Please try again." });
     }
   });
 
@@ -1014,7 +1028,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const codes = await storage.getUserGiftCodes(req.session.userId);
       res.json(codes);
     } catch (error: any) {
-      res.status(500).json({ error: "Failed to fetch gift codes" });
+      console.error("Failed to fetch gift codes:", error);
+      res.status(500).json({ error: "Failed to load your gift codes. Please try again." });
     }
   });
 
