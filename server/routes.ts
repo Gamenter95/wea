@@ -958,7 +958,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, giftCode: created });
     } catch (error: any) {
       console.error("Gift code creation error:", error);
-      res.status(500).json({ error: error.message || "Failed to create gift code. Please try again." });
+      const errorMessage = error.message?.includes("relation") 
+        ? "Database tables not initialized. Please restart the application."
+        : error.message || "Failed to create gift code. Please try again.";
+      res.status(400).json({ error: errorMessage });
     }
   });
 
@@ -1015,7 +1018,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, amount: amount.toFixed(2), newBalance });
     } catch (error: any) {
       console.error("Gift code claim error:", error);
-      res.status(500).json({ error: error.message || "Failed to claim gift code. Please try again." });
+      const errorMessage = error.message?.includes("relation") 
+        ? "Database tables not initialized. Please restart the application."
+        : error.message || "Failed to claim gift code. Please try again.";
+      res.status(400).json({ error: errorMessage });
     }
   });
 
