@@ -94,11 +94,6 @@ export const giftCodeClaims = pgTable("gift_code_claims", {
   claimedAt: timestamp("claimed_at").defaultNow().notNull(),
 });
 
-  recipientWWID: z.string().min(5),
-  amount: z.number().min(1, "Amount must be at least ₹1"),
-  spin: z.string().regex(/^\d{4}$/, "S-PIN must be exactly 4 digits"),
-});
-
 export const withdrawSchema = z.object({
   amount: z.number().min(20, "Minimum withdrawal is ₹20"),
   upiId: z.string().regex(/^[\w.-]+@[\w.-]+$/, "Invalid UPI ID format"),
