@@ -854,8 +854,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         success: true,
         message: "Payment successful",
-        transaction,
-        newBalance: newPayerBalance,
       });
     } catch (error: any) {
       res.status(400).json({ error: error.message || "API payment failed" });
