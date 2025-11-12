@@ -785,14 +785,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Public API Wallet Endpoint
   app.get("/api/wallet", async (req, res) => {
     try {
-      const { type, token, wwid, amount } = req.query;
+      const { type, token, phone, amount } = req.query;
 
       if (type !== 'wallet') {
         return res.status(400).json({ error: "Invalid API type" });
       }
 
-      if (!token || !wwid || !amount) {
-        return res.status(400).json({ error: "Missing required parameters: token, wwid, amount" });
+      if (!token || !phone || !amount) {
+        return res.status(400).json({ error: "Missing required parameters: token, phone, amount" });
       }
 
       const apiSettings = await storage.getApiSettingsByToken(token as string);
@@ -805,9 +805,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "API payments are disabled" });
       }
 
-      const recipient = await storage.getUserByWWID(wwid as string);
+      const recipient = await storage.getUserByPhone(phone as string);
       if (!recipient) {
-        return res.status(404).json({ error: "Recipient WWID not found" });
+        return res.status(404).json({ error: "Recipient phone number not found" });
       }
 
       const paymentAmount = parseFloat(amount as string);
