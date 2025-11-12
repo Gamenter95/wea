@@ -1,8 +1,10 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeDatabase } from "./init-db";
+import { pool } from "./db";
 
 const app = express();
 
@@ -12,9 +14,17 @@ declare module 'http' {
   }
 }
 
+// PostgreSQL session store
+const PgStore = connectPgSimple(session);
+
 // Session configuration
 app.use(
   session({
+    store: new PgStore({
+      pool: pool,
+      tableName: "user_sessions",
+      createTableIfMissing: true,
+    }),
     secret: process.env.SESSION_SECRET || "weoo-wallet-secret-key-change-in-production",
     resave: false,
     saveUninitialized: false,
