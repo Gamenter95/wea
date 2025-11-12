@@ -18,9 +18,9 @@ import Secret from "@/pages/Secret";
 import Admin from "@/pages/Admin";
 import Notifications from "@/pages/Notifications";
 import Profile from "@/pages/Profile";
-import ApiSettings from "@/pages/ApiSettings";
-import Transactions from "@/pages/Transactions";
-import NotFound from "@/pages/not-found";
+import ApiSettings from "./pages/ApiSettings";
+import ClaimCode from "./pages/ClaimCode";
+import NotFound from "./pages/not-found";
 
 function Router() {
   return (
@@ -43,6 +43,7 @@ function Router() {
       <Route path="/notifications" component={Notifications} />
       <Route path="/profile" component={Profile} />
       <Route path="/api" component={ApiSettings} />
+      <Route path="/claim-code" component={ClaimCode} />
       <Route component={NotFound} />
     </Switch>
   );

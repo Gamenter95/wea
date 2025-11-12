@@ -68,6 +68,7 @@ export default function Dashboard() {
     { icon: ArrowDownToLine, label: "Withdraw", onClick: () => { setIsMenuOpen(false); setLocation("/withdraw"); } },
     { icon: Wallet, label: "Transactions", onClick: () => { setIsMenuOpen(false); setLocation("/transactions"); } },
     { icon: Globe, label: "API Gateway", onClick: () => { setIsMenuOpen(false); setLocation("/api"); } },
+    { icon: CreditCard, label: "Gift Codes", onClick: () => { setIsMenuOpen(false); setLocation("/claim-code"); } },
     { icon: User, label: "Profile", onClick: () => { setIsMenuOpen(false); setLocation("/profile"); } },
     { icon: MessageCircle, label: "Contact Us", onClick: () => { setIsMenuOpen(false); window.open("https://t.me/WeooWallet", "_blank"); } },
   ];
