@@ -8,7 +8,6 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   phone: text("phone").notNull().unique(),
   password: text("password").notNull(),
-  wwid: text("wwid").notNull().unique(),
   spin: text("spin").notNull(),
   balance: numeric("balance", { precision: 10, scale: 2 }).notNull().default("0"),
 });
@@ -24,9 +23,7 @@ export const registerSchema = z.object({
   password: z.string().min(6),
 });
 
-export const wwidSchema = z.object({
-  wwid: z.string().regex(/^[a-z0-9]{3,20}$/, "WWID must be 3-20 characters, lowercase letters and numbers only"),
-});
+
 
 export const spinSchema = z.object({
   spin: z.string().regex(/^\d{4}$/, "S-PIN must be exactly 4 digits"),
@@ -57,7 +54,7 @@ export const addFundSchema = z.object({
 });
 
 export const payToUserSchema = z.object({
-  recipientWWID: z.string().min(5),
+  recipientPhone: z.string().min(10).max(15),
   amount: z.number().min(1, "Amount must be at least ₹1"),
   spin: z.string().regex(/^\d{4}$/, "S-PIN must be exactly 4 digits"),
 });
@@ -159,7 +156,6 @@ export const insertApiSettingsSchema = createInsertSchema(apiSettings).omit({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type RegisterInput = z.infer<typeof registerSchema>;
-export type WWIDInput = z.infer<typeof wwidSchema>;
 export type SPINInput = z.infer<typeof spinSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type VerifyPinInput = z.infer<typeof verifyPinSchema>;

@@ -119,7 +119,7 @@ export default function ApiSettings() {
   const getEndpointUrl = () => {
     const domain = settings?.domain || "https://wwallet.koyeb.app";
     const token = settings?.apiToken || "{TOKEN}";
-    return `${domain}/api/wallet?type=wallet&token=${token}&wwid={WWID}&amount={AMOUNT}`;
+    return `${domain}/api/wallet?type=wallet&token=${token}&phone={PHONE}&amount={AMOUNT}`;
   };
 
   if (isLoading) {
@@ -275,7 +275,7 @@ export default function ApiSettings() {
                     <code className="px-2 py-1 bg-background rounded">token</code>: Your API token
                   </li>
                   <li>
-                    <code className="px-2 py-1 bg-background rounded">wwid</code>: Recipient's WWID
+                    <code className="px-2 py-1 bg-background rounded">phone</code>: Recipient's phone number
                   </li>
                   <li>
                     <code className="px-2 py-1 bg-background rounded">amount</code>: Payment amount

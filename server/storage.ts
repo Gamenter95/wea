@@ -59,11 +59,6 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
-  async getUserByWWID(wwid: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.wwid, wwid));
-    return result[0];
-  }
-
   async getUserByUsernameOrPhone(usernameOrPhone: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(
       or(eq(users.username, usernameOrPhone), eq(users.phone, usernameOrPhone))

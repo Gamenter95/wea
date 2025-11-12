@@ -121,7 +121,7 @@ export default function Profile() {
               </div>
             </div>
             <CardTitle className="text-center text-2xl">{user.username}</CardTitle>
-            <CardDescription className="text-center font-mono">{user.wwid}</CardDescription>
+            <CardDescription className="text-center font-mono">{user.phone}</CardDescription>
           </CardHeader>
         </Card>
 
@@ -157,18 +157,7 @@ export default function Profile() {
               </Button>
             </div>
 
-            <div className="flex items-center justify-between p-4 rounded-lg border">
-              <div className="flex items-center gap-3">
-                <CreditCard className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm text-muted-foreground">WWID</p>
-                  <p className="font-medium font-mono">{user.wwid}</p>
-                </div>
-              </div>
-              <Button variant="ghost" size="sm" onClick={() => handleEdit("wwid")}>
-                <Edit className="h-4 w-4" />
-              </Button>
-            </div>
+            
           </CardContent>
         </Card>
 

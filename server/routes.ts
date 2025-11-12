@@ -118,7 +118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Clear registration data from session
       delete req.session.registrationData;
       delete req.session.wwid;
-      
+
       await new Promise<void>((resolve, reject) => {
         req.session.save((err) => {
           if (err) reject(err);
@@ -159,7 +159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Store user ID in session for S-PIN verification
       req.session.userId = user.id;
-      
+
       await new Promise<void>((resolve, reject) => {
         req.session.save((err) => {
           if (err) reject(err);
@@ -272,7 +272,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user: {
           id: user.id,
           username: user.username,
-          wwid: user.wwid,
+          phone: user.phone,
           balance: user.balance,
         },
       });
@@ -303,7 +303,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user: {
           id: user.id,
           username: user.username,
-          wwid: user.wwid,
+          phone: user.phone,
           balance: user.balance,
         },
       });
@@ -355,7 +355,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Sender not found" });
       }
 
-      const recipient = await storage.getUserByWWID(validatedData.recipientWWID);
+      const recipient = await storage.getUserByPhone(validatedData.recipientPhone);
       if (!recipient) {
         return res.status(404).json({ error: "Recipient not found" });
       }
@@ -614,7 +614,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const transactions = await storage.getUserTransactions(req.session.userId);
       const users = await storage.getAllUsers();
-      
+
       const transactionsWithUsers = transactions.map(transaction => {
         const sender = users.find(u => u.id === transaction.senderId);
         const recipient = users.find(u => u.id === transaction.recipientId);
@@ -706,7 +706,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       let settings = await storage.getApiSettings(req.session.userId);
-      
+
       if (!settings) {
         settings = await storage.createApiSettings({
           userId: req.session.userId,
@@ -730,9 +730,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const validatedData = req.body as { enabled: boolean };
       const { enabled } = validatedData;
-      
+
       let settings = await storage.getApiSettings(req.session.userId);
-      
+
       if (!settings) {
         settings = await storage.createApiSettings({
           userId: req.session.userId,
@@ -764,7 +764,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         while (!isUnique && attempts < maxAttempts) {
           token = crypto.randomBytes(4).toString('base64url').substring(0, 5);
-          
+
           const existingSettings = await storage.getApiSettingsByToken(token);
           if (!existingSettings) {
             isUnique = true;
@@ -777,9 +777,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       const newToken = await generateSecureToken();
-      
+
       let settings = await storage.getApiSettings(req.session.userId);
-      
+
       if (!settings) {
         settings = await storage.createApiSettings({
           userId: req.session.userId,
@@ -829,7 +829,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const apiSettings = await storage.getApiSettingsByToken(token as string);
-      
+
       if (!apiSettings) {
         return res.status(401).json({ error: "Invalid or revoked API token" });
       }

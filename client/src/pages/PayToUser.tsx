@@ -14,7 +14,7 @@ export default function PayToUser() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [formData, setFormData] = useState({
-    recipientWWID: "",
+    recipientPhone: "",
     amount: "",
     spin: "",
   });
@@ -28,7 +28,7 @@ export default function PayToUser() {
   });
 
   const payMutation = useMutation({
-    mutationFn: async (data: { recipientWWID: string; amount: number; spin: string }) => {
+    mutationFn: async (data: { recipientPhone: string; amount: number; spin: string }) => {
       const res = await apiRequest("POST", "/api/transactions/pay-to-user", data);
       return await res.json();
     },
@@ -51,7 +51,7 @@ export default function PayToUser() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     payMutation.mutate({
-      recipientWWID: formData.recipientWWID,
+      recipientPhone: formData.recipientPhone,
       amount: parseFloat(formData.amount),
       spin: formData.spin,
     });
@@ -93,17 +93,17 @@ export default function PayToUser() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="recipientWWID">Recipient WWID</Label>
+                <Label htmlFor="recipientPhone">Recipient Phone Number</Label>
                 <Input
-                  id="recipientWWID"
-                  type="text"
-                  placeholder="username@ww"
-                  value={formData.recipientWWID}
+                  id="recipientPhone"
+                  type="tel"
+                  placeholder="9876543210"
+                  value={formData.recipientPhone}
                   onChange={(e) =>
-                    setFormData({ ...formData, recipientWWID: e.target.value })
+                    setFormData({ ...formData, recipientPhone: e.target.value })
                   }
                   required
-                  className="h-12 font-mono"
+                  className="h-12"
                 />
               </div>
 

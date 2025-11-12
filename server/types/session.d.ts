@@ -8,6 +8,5 @@ declare module "express-session" {
       phone: string;
       password: string;
     };
-    wwid?: string;
   }
 }
