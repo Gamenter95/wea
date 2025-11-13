@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, Plus, Send, ArrowDownToLine, Home, Wallet, CreditCard, Globe, User, LogOut, Bell, Phone, MessageCircle } from "lucide-react";
+import { Menu, Plus, Send, ArrowDownToLine, Home, Wallet, CreditCard, Globe, User, LogOut, Bell, Phone, MessageCircle, QrCode, ScanLine } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -179,14 +179,14 @@ export default function Dashboard() {
       </main>
 
       <div className="border-t bg-card/80 backdrop-blur-lg p-6 shadow-lg">
-        <div className="flex justify-around items-center max-w-md mx-auto gap-2">
+        <div className="grid grid-cols-4 gap-2 max-w-2xl mx-auto">
           <button
             onClick={() => setLocation("/add-fund")}
             data-testid="button-add-fund"
-            className="flex flex-col items-center gap-2 hover:scale-105 active:scale-95 transition-all p-3 rounded-2xl hover:bg-primary/5"
+            className="flex flex-col items-center gap-2 hover:scale-105 active:scale-95 transition-all p-2 rounded-2xl hover:bg-primary/5"
           >
-            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 text-white flex items-center justify-center shadow-lg shadow-green-500/30">
-              <Plus className="h-6 w-6" />
+            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 text-white flex items-center justify-center shadow-lg shadow-green-500/30">
+              <Plus className="h-5 w-5" />
             </div>
             <span className="text-xs font-semibold">Add Fund</span>
           </button>
@@ -194,23 +194,34 @@ export default function Dashboard() {
           <button
             onClick={() => setLocation("/pay-to-user")}
             data-testid="button-pay"
-            className="flex flex-col items-center gap-2 hover:scale-105 active:scale-95 transition-all p-3 rounded-2xl hover:bg-primary/5"
+            className="flex flex-col items-center gap-2 hover:scale-105 active:scale-95 transition-all p-2 rounded-2xl hover:bg-primary/5"
           >
-            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
-              <Send className="h-6 w-6" />
+            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
+              <Send className="h-5 w-5" />
             </div>
-            <span className="text-xs font-semibold">Pay to User</span>
+            <span className="text-xs font-semibold">Pay</span>
           </button>
 
           <button
-            onClick={() => setLocation("/withdraw")}
-            data-testid="button-withdraw"
-            className="flex flex-col items-center gap-2 hover:scale-105 active:scale-95 transition-all p-3 rounded-2xl hover:bg-primary/5"
+            onClick={() => setLocation("/scan-qr")}
+            data-testid="button-scan-qr"
+            className="flex flex-col items-center gap-2 hover:scale-105 active:scale-95 transition-all p-2 rounded-2xl hover:bg-primary/5"
           >
-            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 text-white flex items-center justify-center shadow-lg shadow-orange-500/30">
-              <ArrowDownToLine className="h-6 w-6" />
+            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/30">
+              <ScanLine className="h-5 w-5" />
             </div>
-            <span className="text-xs font-semibold">Withdraw</span>
+            <span className="text-xs font-semibold">Scan QR</span>
+          </button>
+
+          <button
+            onClick={() => setLocation("/my-qr")}
+            data-testid="button-my-qr"
+            className="flex flex-col items-center gap-2 hover:scale-105 active:scale-95 transition-all p-2 rounded-2xl hover:bg-primary/5"
+          >
+            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 text-white flex items-center justify-center shadow-lg shadow-pink-500/30">
+              <QrCode className="h-5 w-5" />
+            </div>
+            <span className="text-xs font-semibold">My QR</span>
           </button>
         </div>
       </div>
