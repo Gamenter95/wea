@@ -21,6 +21,8 @@ import Profile from "@/pages/Profile";
 import ApiSettings from "./pages/ApiSettings";
 import ClaimCode from "./pages/ClaimCode";
 import TransactionsPage from "@/pages/Transactions"; // Corrected import path and name
+import MyQRCode from "./pages/MyQRCode";
+import ScanQR from "./pages/ScanQR";
 import NotFound from "./pages/not-found";
 
 function Router() {
@@ -45,6 +47,8 @@ function Router() {
       <Route path="/profile" component={Profile} />
       <Route path="/api" component={ApiSettings} />
       <Route path="/claim-code" component={ClaimCode} />
+      <Route path="/my-qr" component={MyQRCode} />
+      <Route path="/scan-qr" component={ScanQR} />
       <Route component={NotFound} />
     </Switch>
   );
